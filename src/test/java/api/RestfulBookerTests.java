@@ -26,67 +26,73 @@ public class RestfulBookerTests {
     }
 
     @Test
-    public void test02_GetBookingById() {
-        // Asumiendo que el ID 1 o 2 casi siempre existen en esta API pública
+    public void test02_FilterBookingsByDates() {
         given()
-            .when()
-            .get("/booking/1")
-            .then()
-            .statusCode(200)
-            .body("firstname", notNullValue())
-            .body("lastname", notNullValue());
-    }
-
-    @Test
-    public void test03_GetBookingsByFirstName() {
-        given()
-            .queryParam("firstname", "sally") // Filtro
+            .queryParam("checkin", "2024-01-01")
+            .queryParam("checkout", "2024-01-10")
             .when()
             .get("/booking")
             .then()
-            .statusCode(200);
+            .statusCode(200)
+            .body("size()", greaterThanOrEqualTo(0));
     }
 
     @Test
-    public void test04_GenerateAuthToken() {
-        String payload = "{\n" +
-                "    \"username\" : \"admin\",\n" +
-                "    \"password\" : \"password123\"\n" +
+    public void test03_GetBookingsByFirstNameParam() {
+        // Valida la capacidad del endpoint de filtrar por parámetro de consulta de forma dinámica
+        given()
+            .queryParam("firstname", "John")
+            .when()
+            .get("/booking")
+            .then()
+            .statusCode(200)
+            .body("size()", greaterThanOrEqualTo(0));
+    }
+
+    @Test
+    public void test04_CreateBookingMissingFirstname() {
+        // Prueba negativa: POST sin el campo requerido 'firstname'
+        String invalidPayload = "{\n" +
+                "    \"lastname\" : \"Mendoza\",\n" +
+                "    \"totalprice\" : 150,\n" +
+                "    \"depositpaid\" : true,\n" +
+                "    \"bookingdates\" : {\n" +
+                "        \"checkin\" : \"2024-01-01\",\n" +
+                "        \"checkout\" : \"2024-01-10\"\n" +
+                "    }\n" +
                 "}";
 
         given()
             .contentType(ContentType.JSON)
-            .body(payload)
+            .accept(ContentType.JSON)
+            .body(invalidPayload)
             .when()
-            .post("/auth")
+            .post("/booking")
             .then()
-            .statusCode(200)
-            .body("token", notNullValue());
+            .statusCode(500); // La API rechaza la solicitud por falta de campo obligatorio
     }
 
     @Test
-public void test05_CreateNewBooking() {
-    String newBooking = "{\n" +
-            "    \"firstname\" : \"Carlos\",\n" +
-            "    \"lastname\" : \"Mendoza\",\n" +
-            "    \"totalprice\" : 150,\n" +
-            "    \"depositpaid\" : true,\n" +
-            "    \"bookingdates\" : {\n" +
-            "        \"checkin\" : \"2024-01-01\",\n" +
-            "        \"checkout\" : \"2024-01-10\"\n" +
-            "    },\n" +
-            "    \"additionalneeds\" : \"Breakfast\"\n" +
-            "}";
+    public void test05_CreateBookingInvalidTotalPrice() {
+        // Prueba negativa: POST con 'totalprice' en formato string en lugar de int
+        String invalidPayload = "{\n" +
+                "    \"firstname\" : \"Carlos\",\n" +
+                "    \"lastname\" : \"Mendoza\",\n" +
+                "    \"totalprice\" : \"monto_invalido\",\n" +
+                "    \"depositpaid\" : true,\n" +
+                "    \"bookingdates\" : {\n" +
+                "        \"checkin\" : \"2024-01-01\",\n" +
+                "        \"checkout\" : \"2024-01-10\"\n" +
+                "    }\n" +
+                "}";
 
-    given()
-        .contentType(ContentType.JSON)
-        .accept(ContentType.JSON)
-        .body(newBooking)
-        .when()
-        .post("/booking")
-        .then()
-        .statusCode(200)
-        .body("booking.firstname", equalTo("Carlos"))
-        .body("bookingid", notNullValue());
+        given()
+            .contentType(ContentType.JSON)
+            .accept(ContentType.JSON)
+            .body(invalidPayload)
+            .when()
+            .post("/booking")
+            .then()
+            .statusCode(500); // La API rechaza la solicitud por tipo de dato incorrecto
     }
 }

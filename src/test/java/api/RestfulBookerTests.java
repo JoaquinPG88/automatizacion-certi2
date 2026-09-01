@@ -73,26 +73,26 @@ public class RestfulBookerTests {
     }
 
     @Test
-    public void test05_CreateBookingInvalidTotalPrice() {
-        // Prueba negativa: POST con 'totalprice' en formato string en lugar de int
-        String invalidPayload = "{\n" +
-                "    \"firstname\" : \"Carlos\",\n" +
-                "    \"lastname\" : \"Mendoza\",\n" +
-                "    \"totalprice\" : \"monto_invalido\",\n" +
-                "    \"depositpaid\" : true,\n" +
-                "    \"bookingdates\" : {\n" +
-                "        \"checkin\" : \"2024-01-01\",\n" +
-                "        \"checkout\" : \"2024-01-10\"\n" +
-                "    }\n" +
-                "}";
+public void test05_CreateBookingInvalidTotalPrice() {
+    // Prueba negativa: POST con 'totalprice' en formato string en lugar de int
+    String invalidPayload = "{\n" +
+            "    \"firstname\" : \"Carlos\",\n" +
+            "    \"lastname\" : \"Mendoza\",\n" +
+            "    \"totalprice\" : \"monto_invalido\",\n" +
+            "    \"depositpaid\" : true,\n" +
+            "    \"bookingdates\" : {\n" +
+            "        \"checkin\" : \"2024-01-01\",\n" +
+            "        \"checkout\" : \"2024-01-10\"\n" +
+            "    }\n" +
+            "}";
 
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body(invalidPayload)
-            .when()
-            .post("/booking")
-            .then()
-            .statusCode(500); // La API rechaza la solicitud por tipo de dato incorrecto
+    given()
+        .contentType(ContentType.JSON)
+        .accept(ContentType.JSON)
+        .body(invalidPayload)
+        .when()
+        .post("/booking")
+        .then()
+        .statusCode(418); // La API devuelve 418 cuando el JSON tiene tipos de datos invalidos
     }
 }

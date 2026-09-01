@@ -11,7 +11,6 @@ public class InventoryPage {
     private By firstItemName = By.cssSelector(".inventory_item_name");
     private By firstItemPrice = By.cssSelector(".inventory_item_price");
     private By addToCartButton = By.cssSelector("[data-test='add-to-cart-sauce-labs-backpack']");
-    private By removeButton = By.cssSelector("[data-test='remove-sauce-labs-backpack']");
     private By cartBadge = By.cssSelector(".shopping_cart_badge");
     private By cartLink = By.cssSelector(".shopping_cart_link");
     
